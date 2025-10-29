@@ -19,8 +19,8 @@ def get_random_movie(db: Session = Depends(get_db)):
 
     The magic of UnreliableUnicorn: mixing authentic reviews with absurd opinions!
     """
-    # Get a random movie
-    movie = db.query(Movie).order_by(func.rand()).first()
+    # Get a random movie (PostgreSQL uses random(), MySQL uses rand())
+    movie = db.query(Movie).order_by(func.random()).first()
 
     if not movie:
         raise HTTPException(status_code=404, detail="No movies found in database")
