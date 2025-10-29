@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+python-dotenv
+pymysql
+psycopg2-binary
+cryptography
+alembic
+pydantic
+httpx
+gunicorn

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UnreliableUnicorn - Movie Images Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #fff;
+        }
+        h1 {
+            text-align: center;
+            color: #ff6b9d;
+        }
+        .movie-card {
+            background: #2a2a2a;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .movie-header {
+            display: flex;
+            gap: 20px;
+        }
+        .poster {
+            width: 200px;
+            border-radius: 8px;
+        }
+        .movie-info {
+            flex: 1;
+        }
+        .movie-title {
+            font-size: 24px;
+            color: #ff6b9d;
+            margin: 0 0 10px 0;
+        }
+        .genres {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .genre-tag {
+            background: #ff6b9d;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+        .review {
+            background: #1a1a1a;
+            padding: 15px;
+            border-left: 3px solid #4a9eff;
+            margin: 10px 0;
+        }
+        .opinion {
+            background: #1a1a1a;
+            padding: 15px;
+            border-left: 3px solid #ffd700;
+            margin: 10px 0;
+        }
+        button {
+            background: #ff6b9d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #ff4d7d;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🦄 UnreliableUnicorn - Movie Images Demo</h1>
+    <p style="text-align: center; color: #aaa;">This page demonstrates that movie images are already linked and accessible from the API!</p>
+
+    <div style="text-align: center; margin: 20px 0;">
+        <button onclick="loadRandomMovie()">Load Random Movie</button>
+        <button onclick="searchMovie()">Search "Interstellar"</button>
+    </div>
+
+    <div id="content"></div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+
+        async function loadRandomMovie() {
+            const content = document.getElementById('content');
+            content.innerHTML = '<div class="loading">Loading random movie...</div>';
+
+            try {
+                const response = await fetch(`${API_URL}/pelicula/random`);
+                const movie = await response.json();
+                displayMovie(movie);
+            } catch (error) {
+                content.innerHTML = `<div class="loading">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function searchMovie() {
+            const content = document.getElementById('content');
+            content.innerHTML = '<div class="loading">Searching for Interstellar...</div>';
+
+            try {
+                const response = await fetch(`${API_URL}/pelicula/search?q=interstellar`);
+                const movies = await response.json();
+                if (movies && movies.length > 0) {
+                    displayFullMovie(movies[0]);
+                }
+            } catch (error) {
+                content.innerHTML = `<div class="loading">Error: ${error.message}</div>`;
+            }
+        }
+
+        function displayMovie(movie) {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="movie-card">
+                    <div class="movie-header">
+                        <img src="${movie.poster_url}" alt="${movie.title}" class="poster"
+                             onerror="this.src='https://via.placeholder.com/200x300?text=No+Image'">
+                        <div class="movie-info">
+                            <h2 class="movie-title">${movie.title}</h2>
+                            <p><strong>Release Date:</strong> ${movie.release_date || 'N/A'}</p>
+                            <p><strong>Runtime:</strong> ${movie.runtime || 'N/A'} minutes</p>
+                            <p><strong>Rating:</strong> ⭐ ${movie.vote_average || 'N/A'}/10</p>
+                            <div class="genres">
+                                ${movie.genres.map(g => `<span class="genre-tag">${g}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+
+                    ${movie.real_review ? `
+                        <div class="review">
+                            <strong>📝 Real Review:</strong><br>
+                            ${movie.real_review}
+                        </div>
+                    ` : ''}
+
+                    <div class="opinion">
+                        <strong>🦄 Unreliable Opinion:</strong><br>
+                        ${movie.fake_opinion}
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayFullMovie(movie) {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="movie-card">
+                    <div class="movie-header">
+                        <img src="${movie.poster_url}" alt="${movie.title}" class="poster"
+                             onerror="this.src='https://via.placeholder.com/200x300?text=No+Image'">
+                        <div class="movie-info">
+                            <h2 class="movie-title">${movie.title}</h2>
+                            <p>${movie.overview || 'No overview available'}</p>
+                            <p><strong>Release Date:</strong> ${movie.release_date || 'N/A'}</p>
+                            <p><strong>Runtime:</strong> ${movie.runtime || 'N/A'} minutes</p>
+                            <p><strong>Rating:</strong> ⭐ ${movie.vote_average || 'N/A'}/10 (${movie.vote_count || 0} votes)</p>
+                            <div class="genres">
+                                ${movie.genres.map(g => `<span class="genre-tag">${g.name}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <p style="margin-top: 20px; color: #aaa; font-size: 14px;">
+                        <strong>Image URLs:</strong><br>
+                        Poster: <a href="${movie.poster_url}" target="_blank" style="color: #ff6b9d;">${movie.poster_url}</a><br>
+                        Backdrop: <a href="${movie.backdrop_url}" target="_blank" style="color: #ff6b9d;">${movie.backdrop_url}</a>
+                    </p>
+                </div>
+            `;
+        }
+
+        // Load a random movie on page load
+        loadRandomMovie();
+    </script>
+</body>
+</html>

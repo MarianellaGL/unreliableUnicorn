@@ -1,0 +1,23 @@
+services:
+  # Web Service (API)
+  - type: web
+    name: unreliableunicorn-api
+    env: docker
+    plan: free
+    dockerfilePath: ./dockerfile
+    dockerContext: .
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: unreliableunicorn-db
+          property: connectionString
+      - key: TMDB_URL
+        sync: false  # You'll set this manually in Render dashboard
+    healthCheckPath: /health/db
+
+databases:
+  # PostgreSQL Database
+  - name: unreliableunicorn-db
+    plan: free
+    databaseName: unreliableunicorn
+    user: unreliableunicorn
