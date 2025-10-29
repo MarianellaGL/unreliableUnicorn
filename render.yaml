@@ -4,7 +4,7 @@ services:
     name: unreliableunicorn-api
     env: docker
     plan: free
-    dockerfilePath: ./dockerfile
+    dockerfilePath: ./Dockerfile
     dockerContext: .
     envVars:
       - key: DATABASE_URL
