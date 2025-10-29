@@ -7,7 +7,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-# Load environment variables
+# Load environment variables from .env file if it exists (development only)
 load_dotenv()
 
 # this is the Alembic Config object, which provides
@@ -16,8 +16,14 @@ config = context.config
 
 # Override sqlalchemy.url with DATABASE_URL from environment
 database_url = os.getenv("DATABASE_URL")
-if database_url:
-    config.set_main_option("sqlalchemy.url", database_url)
+if not database_url:
+    raise ValueError("DATABASE_URL environment variable is not set!")
+
+# Fix Render's postgres:// URL to postgresql:// for SQLAlchemy
+if database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+config.set_main_option("sqlalchemy.url", database_url)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

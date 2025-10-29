@@ -11,6 +11,9 @@ if [ -z "$DATABASE_URL" ]; then
     exit 1
 else
     echo "  DATABASE_URL is set (starts with: ${DATABASE_URL:0:20}...)"
+    # Extract and show the hostname (for debugging connection issues)
+    hostname=$(echo "$DATABASE_URL" | sed -n 's|.*@\([^:/]*\).*|\1|p')
+    echo "  Connecting to hostname: $hostname"
 fi
 
 # Run migrations

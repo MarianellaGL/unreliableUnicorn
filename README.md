@@ -1,5 +1,8 @@
 # 🦄 UnreliableUnicorn API
 
+[![Docker Hub](https://img.shields.io/docker/v/marianellagl/unreliableunicorn?label=docker&logo=docker)](https://hub.docker.com/r/marianellagl/unreliableunicorn)
+[![Docker Image Size](https://img.shields.io/docker/image-size/marianellagl/unreliableunicorn/latest)](https://hub.docker.com/r/marianellagl/unreliableunicorn)
+
 **"The Critic You Shouldn't Trust"**
 
 A playful REST API that serves real movie data mixed with nonsensical, sarcastic, or hilariously absurd opinions. It blends authentic reviews from TMDb with AI-generated humor, creating unpredictable movie critiques that make no sense—but are always entertaining.
@@ -32,18 +35,43 @@ A playful REST API that serves real movie data mixed with nonsensical, sarcastic
 - **Containerization**: Docker
 - **External API**: TMDb API
 
-## Quick Start (Local)
+## Quick Start
 
-### Prerequisites
+### Option 1: Using Docker Hub (Fastest)
+
+Pull and run the pre-built image from Docker Hub:
+
+```bash
+# Pull the image
+docker pull marianellagl/unreliableunicorn:latest
+
+# Run with MySQL database
+docker run -d \
+  --name unreliableunicorn_api \
+  -p 8000:8000 \
+  -e DATABASE_URL="mysql+pymysql://root:YOUR_PASSWORD@host.docker.internal:3306/unreliableunicorn?charset=utf8mb4" \
+  -e TMDB_URL="your_tmdb_api_key_here" \
+  marianellagl/unreliableunicorn:latest
+```
+
+Then access:
+- API: http://localhost:8000
+- Interactive Docs: http://localhost:8000/docs
+
+### Option 2: Using Docker Compose (Full Setup)
+
+Clone and run the complete stack with database included.
+
+#### Prerequisites
 - Docker & Docker Compose
 - TMDb API Key (get it free at https://www.themoviedb.org/settings/api)
 
-### Setup
+#### Setup
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/YOUR_USERNAME/unreliableunicorn.git
-cd unreliableunicorn
+git clone https://github.com/MarianellaGL/unreliableUnicorn.git
+cd unreliableUnicorn
 ```
 
 2. **Create `.env` file**
