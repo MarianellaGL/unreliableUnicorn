@@ -1,5 +1,5 @@
-from typing import Optional, List
-from pydantic import BaseModel, field_serializer
+from typing import Optional, List, Union
+from pydantic import BaseModel, validator
 from datetime import date
 
 
@@ -24,9 +24,11 @@ class MovieResponse(BaseModel):
     vote_count: Optional[int]
     genres: List[GenreSchema] = []
 
-    @field_serializer('release_date')
-    def serialize_release_date(self, value: Optional[date]) -> Optional[str]:
-        return value.isoformat() if value else None
+    @validator('release_date', pre=True)
+    def convert_date_to_string(cls, v):
+        if isinstance(v, date):
+            return v.isoformat()
+        return v
 
     class Config:
         from_attributes = True
