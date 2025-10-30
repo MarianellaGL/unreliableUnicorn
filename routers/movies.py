@@ -4,9 +4,11 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, or_
 from typing import Optional, List
 
-from models import Movie, ExternalReview, GeneratedOpinion, UserOpinion
-from schemas.movie import RandomMovieResponse, MovieResponse
+from models import Movie, ExternalReview, GeneratedOpinion, UserOpinion, Genre
+from models.review import ReviewSource
+from schemas.movie import RandomMovieResponse, MovieResponse, MovieCreate
 from schemas.opinion import OpinionCreate, OpinionResponse
+from schemas.review import ReviewCreate, ReviewResponse
 from database import get_db
 
 router = APIRouter(prefix="/pelicula", tags=["movies"])
@@ -92,6 +94,100 @@ def add_opinion(
         content=new_opinion.content,
         created_at=new_opinion.created_at.isoformat()
     )
+
+
+@router.post("/{movie_id}/review", response_model=ReviewResponse, status_code=201)
+def add_anonymous_review(
+    movie_id: int,
+    review_data: ReviewCreate,
+    db: Session = Depends(get_db)
+):
+    """
+    Submit an anonymous review for a movie.
+
+    Help fill in the gaps! If a movie doesn't have real reviews yet,
+    you can submit your own honest take on it.
+    """
+    # Check if movie exists
+    movie = db.query(Movie).filter(Movie.id == movie_id).first()
+    if not movie:
+        raise HTTPException(status_code=404, detail=f"Movie with id {movie_id} not found")
+
+    # Create new anonymous review
+    new_review = ExternalReview(
+        movie_id=movie_id,
+        source=ReviewSource.USER,
+        author=review_data.author if review_data.author else "Anonymous",
+        content=review_data.content,
+        rating=review_data.rating
+    )
+
+    db.add(new_review)
+    db.commit()
+    db.refresh(new_review)
+
+    return ReviewResponse(
+        id=new_review.id,
+        movie_id=new_review.movie_id,
+        movie_title=movie.title,
+        source=new_review.source.value,
+        author=new_review.author,
+        content=new_review.content,
+        rating=new_review.rating,
+        created_at=new_review.created_at.isoformat()
+    )
+
+
+@router.post("/", response_model=MovieResponse, status_code=201)
+def create_movie(
+    movie_data: MovieCreate,
+    db: Session = Depends(get_db)
+):
+    """
+    Upload a new movie to the catalog.
+
+    Don't see your favorite movie? Add it yourself! Include title, overview,
+    release date, and image URLs. We'll add it to our unreliable collection!
+    """
+    # Check if movie already exists by title
+    existing_movie = db.query(Movie).filter(
+        or_(
+            Movie.title == movie_data.title,
+            Movie.original_title == movie_data.title
+        )
+    ).first()
+
+    if existing_movie:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Movie '{movie_data.title}' already exists in the catalog"
+        )
+
+    # Create new movie
+    new_movie = Movie(
+        title=movie_data.title,
+        original_title=movie_data.original_title,
+        overview=movie_data.overview,
+        release_date=movie_data.release_date,
+        runtime=movie_data.runtime,
+        poster_url=movie_data.poster_url,
+        backdrop_url=movie_data.backdrop_url
+    )
+
+    # Handle genres
+    for genre_name in movie_data.genre_names:
+        # Try to find existing genre or create new one
+        genre = db.query(Genre).filter(Genre.name == genre_name).first()
+        if not genre:
+            genre = Genre(name=genre_name)
+            db.add(genre)
+        new_movie.genres.append(genre)
+
+    db.add(new_movie)
+    db.commit()
+    db.refresh(new_movie)
+
+    return new_movie
 
 
 @router.get("/search", response_model=List[MovieResponse])

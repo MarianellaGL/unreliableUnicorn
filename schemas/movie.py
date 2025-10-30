@@ -1,5 +1,5 @@
 from typing import Optional, List, Union
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, Field, HttpUrl
 from datetime import date
 
 
@@ -9,6 +9,18 @@ class GenreSchema(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class MovieCreate(BaseModel):
+    """Schema for creating a new movie"""
+    title: str = Field(..., min_length=1, max_length=255, description="Movie title")
+    original_title: Optional[str] = Field(None, max_length=255, description="Original title")
+    overview: Optional[str] = Field(None, max_length=5000, description="Movie overview/synopsis")
+    release_date: Optional[str] = Field(None, description="Release date (YYYY-MM-DD format)")
+    runtime: Optional[int] = Field(None, ge=1, description="Runtime in minutes")
+    poster_url: Optional[str] = Field(None, max_length=500, description="URL to poster image")
+    backdrop_url: Optional[str] = Field(None, max_length=500, description="URL to backdrop image")
+    genre_names: List[str] = Field(default=[], description="List of genre names (e.g., ['Action', 'Drama'])")
 
 
 class MovieResponse(BaseModel):

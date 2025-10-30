@@ -10,6 +10,7 @@ class ReviewSource(str, enum.Enum):
     NYT = "nyt"
     GUARDIAN = "guardian"
     OMDB = "omdb"
+    USER = "user"  # Anonymous user-submitted reviews
     OTHER = "other"
 
 
