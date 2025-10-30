@@ -47,6 +47,7 @@ def get_random_movie(db: Session = Depends(get_db)):
     release_date_str = movie.release_date.isoformat() if movie.release_date else None
 
     return RandomMovieResponse(
+        id=movie.id,
         title=movie.title,
         original_title=movie.original_title,
         poster_url=movie.poster_url,

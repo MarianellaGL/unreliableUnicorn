@@ -48,6 +48,7 @@ class MovieResponse(BaseModel):
 
 class RandomMovieResponse(BaseModel):
     """Response for GET /pelicula/random"""
+    id: int
     title: str
     original_title: Optional[str]
     poster_url: Optional[str]
