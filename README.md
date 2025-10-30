@@ -14,6 +14,8 @@ A playful REST API that serves real movie data mixed with nonsensical, sarcastic
 - ⭐ **94 Real Reviews** from TMDb users
 - 😂 **294 Absurd Opinions** with absurdity scores (7-10/10)
 - 🗳️ **Voting System** (up, down, lol, wtf)
+- 📝 **User-Generated Content**: Submit anonymous reviews for movies
+- ➕ **Community Catalog**: Upload new movies with posters and metadata
 
 ## API Endpoints
 
@@ -21,8 +23,13 @@ A playful REST API that serves real movie data mixed with nonsensical, sarcastic
 |----------|--------|-------------|
 | `/` | GET | Welcome message with endpoint list |
 | `/pelicula/random` | GET | Random movie with real review + fake opinion |
+| `/pelicula/search` | GET | Search movies by title |
+| `/pelicula/` | POST | **NEW!** Upload a new movie to the catalog |
 | `/pelicula/{id}/opinion` | POST | Add your own opinion to a movie |
+| `/pelicula/{id}/review` | POST | **NEW!** Submit an anonymous review for a movie |
 | `/opiniones/top` | GET | Top-ranked absurd opinions |
+| `/vote/opinion/{id}` | POST | Vote on a generated opinion |
+| `/vote/user-opinion/{id}` | POST | Vote on a user opinion |
 | `/health/db` | GET | Database health check |
 | `/docs` | GET | Interactive API documentation |
 
@@ -125,6 +132,67 @@ Quick deploy button:
 }
 ```
 
+### POST /pelicula/ (Upload Movie)
+
+**Request:**
+```json
+{
+  "title": "My Favorite Film",
+  "original_title": "Mon Film Préféré",
+  "overview": "A captivating story about...",
+  "release_date": "2024-12-01",
+  "runtime": 120,
+  "poster_url": "https://example.com/poster.jpg",
+  "backdrop_url": "https://example.com/backdrop.jpg",
+  "genre_names": ["Drama", "Romance"]
+}
+```
+
+**Response:**
+```json
+{
+  "id": 101,
+  "title": "My Favorite Film",
+  "original_title": "Mon Film Préféré",
+  "overview": "A captivating story about...",
+  "release_date": "2024-12-01",
+  "runtime": 120,
+  "poster_url": "https://example.com/poster.jpg",
+  "backdrop_url": "https://example.com/backdrop.jpg",
+  "vote_average": null,
+  "vote_count": null,
+  "genres": [
+    {"id": 18, "name": "Drama"},
+    {"id": 10749, "name": "Romance"}
+  ]
+}
+```
+
+### POST /pelicula/{movie_id}/review (Anonymous Review)
+
+**Request:**
+```json
+{
+  "author": "Anonymous",
+  "content": "This movie was incredible! The cinematography and acting were top-notch.",
+  "rating": "9/10"
+}
+```
+
+**Response:**
+```json
+{
+  "id": 250,
+  "movie_id": 101,
+  "movie_title": "My Favorite Film",
+  "source": "user",
+  "author": "Anonymous",
+  "content": "This movie was incredible! The cinematography and acting were top-notch.",
+  "rating": "9/10",
+  "created_at": "2025-10-30T14:15:30"
+}
+```
+
 ### GET /opiniones/top?limit=3
 
 ```json
@@ -195,12 +263,15 @@ This is a learning project, but feel free to:
 ## Future Enhancements
 
 - [ ] User authentication (JWT)
+- [x] ~~Search and filter endpoints~~ ✅ Implemented
+- [x] ~~User-submitted reviews~~ ✅ Implemented
+- [x] ~~Movie upload functionality~~ ✅ Implemented
 - [ ] Vote functionality implementation
 - [ ] NYT & Guardian API integration
-- [ ] Search and filter endpoints
 - [ ] Frontend web app (React/Vue)
 - [ ] More absurd opinion templates
 - [ ] LLM-generated opinions
+- [ ] Image upload service (instead of URLs)
 
 ## License
 
