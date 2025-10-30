@@ -16,22 +16,44 @@ A playful REST API that serves real movie data mixed with nonsensical, sarcastic
 - 🗳️ **Voting System** (up, down, lol, wtf)
 - 📝 **User-Generated Content**: Submit anonymous reviews for movies
 - ➕ **Community Catalog**: Upload new movies with posters and metadata
+- 🔒 **API Key Authentication**: Secure write endpoints with API keys
 
 ## API Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/` | GET | Welcome message with endpoint list |
-| `/pelicula/random` | GET | Random movie with real review + fake opinion |
-| `/pelicula/search` | GET | Search movies by title |
-| `/pelicula/` | POST | **NEW!** Upload a new movie to the catalog |
-| `/pelicula/{id}/opinion` | POST | Add your own opinion to a movie |
-| `/pelicula/{id}/review` | POST | **NEW!** Submit an anonymous review for a movie |
-| `/opiniones/top` | GET | Top-ranked absurd opinions |
-| `/vote/opinion/{id}` | POST | Vote on a generated opinion |
-| `/vote/user-opinion/{id}` | POST | Vote on a user opinion |
-| `/health/db` | GET | Database health check |
-| `/docs` | GET | Interactive API documentation |
+| Endpoint | Method | Auth Required | Description |
+|----------|--------|---------------|-------------|
+| `/` | GET | ❌ | Welcome message with endpoint list |
+| `/pelicula/random` | GET | ❌ | Random movie with real review + fake opinion |
+| `/pelicula/search` | GET | ❌ | Search movies by title |
+| `/pelicula/` | POST | ✅ | **NEW!** Upload a new movie to the catalog |
+| `/pelicula/{id}/opinion` | POST | ✅ | Add your own opinion to a movie |
+| `/pelicula/{id}/absurd-opinion` | POST | ✅ | **NEW!** Create an absurd/generated opinion |
+| `/pelicula/{id}/review` | POST | ✅ | **NEW!** Submit an anonymous review for a movie |
+| `/opiniones/top` | GET | ❌ | Top-ranked absurd opinions |
+| `/vote/opinion/{id}` | POST | ✅ | Vote on a generated opinion |
+| `/vote/user-opinion/{id}` | POST | ✅ | Vote on a user opinion |
+| `/health/db` | GET | ❌ | Database health check |
+| `/docs` | GET | ❌ | Interactive API documentation |
+
+### Authentication
+
+All `POST` endpoints require API key authentication. Include your API key in the request header:
+
+```bash
+X-API-Key: your_api_key_here
+```
+
+**Example authenticated request:**
+```bash
+curl -X POST "https://your-api.com/pelicula/123/review" \
+  -H "X-API-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "author": "Anonymous",
+    "content": "Great movie!",
+    "rating": "9/10"
+  }'
+```
 
 ## Tech Stack
 
@@ -91,6 +113,7 @@ DATABASE_URL=mysql+pymysql://root:YOUR_PASSWORD@db:3306/unreliableunicorn?charse
 DB_ROOT_PASSWORD=YOUR_PASSWORD
 DB_PASSWORD=YOUR_PASSWORD
 TMDB_URL=your_tmdb_api_key_here
+API_KEY=your_secure_api_key_here  # Generate with: openssl rand -hex 32
 ```
 
 3. **Start services**
@@ -165,6 +188,30 @@ Quick deploy button:
     {"id": 18, "name": "Drama"},
     {"id": 10749, "name": "Romance"}
   ]
+}
+```
+
+### POST /pelicula/{movie_id}/absurd-opinion (Create Absurd Opinion)
+
+**Request:**
+```json
+{
+  "content": "This movie made me question reality. Not because it was deep, but because I can't believe I watched the whole thing.",
+  "absurdity_score": 8.5,
+  "generation_method": "manual"
+}
+```
+
+**Response:**
+```json
+{
+  "id": 295,
+  "movie_id": 101,
+  "movie_title": "My Favorite Film",
+  "content": "This movie made me question reality. Not because it was deep, but because I can't believe I watched the whole thing.",
+  "absurdity_score": 8.5,
+  "generation_method": "manual",
+  "created_at": "2025-10-30T14:20:15"
 }
 ```
 

@@ -3,9 +3,16 @@ from pydantic import BaseModel, Field
 
 
 class OpinionCreate(BaseModel):
-    """Schema for creating a new opinion"""
+    """Schema for creating a new user opinion"""
     author_name: Optional[str] = Field(None, max_length=255)
     content: str = Field(..., min_length=1, max_length=5000)
+
+
+class GeneratedOpinionCreate(BaseModel):
+    """Schema for creating a new absurd/generated opinion"""
+    content: str = Field(..., min_length=10, max_length=5000, description="The absurd opinion content")
+    absurdity_score: float = Field(..., ge=0.0, le=10.0, description="Absurdity score from 0-10")
+    generation_method: Optional[str] = Field(None, max_length=100, description="How it was generated (e.g., 'manual', 'template', 'llm')")
 
 
 class OpinionResponse(BaseModel):
@@ -15,6 +22,20 @@ class OpinionResponse(BaseModel):
     movie_title: str
     author_name: Optional[str]
     content: str
+    created_at: str
+
+    class Config:
+        from_attributes = True
+
+
+class GeneratedOpinionResponse(BaseModel):
+    """Response after creating a generated opinion"""
+    id: int
+    movie_id: int
+    movie_title: str
+    content: str
+    absurdity_score: float
+    generation_method: Optional[str]
     created_at: str
 
     class Config:

@@ -1,5 +1,5 @@
 import random
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, Security
 from sqlalchemy.orm import Session
 from sqlalchemy import func, or_
 from typing import Optional, List
@@ -7,9 +7,10 @@ from typing import Optional, List
 from models import Movie, ExternalReview, GeneratedOpinion, UserOpinion, Genre
 from models.review import ReviewSource
 from schemas.movie import RandomMovieResponse, MovieResponse, MovieCreate
-from schemas.opinion import OpinionCreate, OpinionResponse
+from schemas.opinion import OpinionCreate, OpinionResponse, GeneratedOpinionCreate, GeneratedOpinionResponse
 from schemas.review import ReviewCreate, ReviewResponse
 from database import get_db
+from auth import verify_api_key
 
 router = APIRouter(prefix="/pelicula", tags=["movies"])
 
@@ -63,7 +64,8 @@ def get_random_movie(db: Session = Depends(get_db)):
 def add_opinion(
     movie_id: int,
     opinion_data: OpinionCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    api_key: str = Security(verify_api_key)
 ):
     """
     Adds a new (possibly ridiculous) opinion for a movie.
@@ -96,11 +98,53 @@ def add_opinion(
     )
 
 
+@router.post("/{movie_id}/absurd-opinion", response_model=GeneratedOpinionResponse, status_code=201)
+def add_absurd_opinion(
+    movie_id: int,
+    opinion_data: GeneratedOpinionCreate,
+    db: Session = Depends(get_db),
+    api_key: str = Security(verify_api_key)
+):
+    """
+    Create an absurd/generated opinion for a movie.
+
+    Generate hilarious, nonsensical, or satirical opinions with an absurdity score.
+    Perfect for adding humor to movie reviews!
+    """
+    # Check if movie exists
+    movie = db.query(Movie).filter(Movie.id == movie_id).first()
+    if not movie:
+        raise HTTPException(status_code=404, detail=f"Movie with id {movie_id} not found")
+
+    # Create new generated opinion
+    new_opinion = GeneratedOpinion(
+        movie_id=movie_id,
+        content=opinion_data.content,
+        absurdity_score=opinion_data.absurdity_score,
+        generation_method=opinion_data.generation_method or "manual"
+    )
+
+    db.add(new_opinion)
+    db.commit()
+    db.refresh(new_opinion)
+
+    return GeneratedOpinionResponse(
+        id=new_opinion.id,
+        movie_id=new_opinion.movie_id,
+        movie_title=movie.title,
+        content=new_opinion.content,
+        absurdity_score=new_opinion.absurdity_score,
+        generation_method=new_opinion.generation_method,
+        created_at=new_opinion.created_at.isoformat()
+    )
+
+
 @router.post("/{movie_id}/review", response_model=ReviewResponse, status_code=201)
 def add_anonymous_review(
     movie_id: int,
     review_data: ReviewCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    api_key: str = Security(verify_api_key)
 ):
     """
     Submit an anonymous review for a movie.
@@ -141,7 +185,8 @@ def add_anonymous_review(
 @router.post("/", response_model=MovieResponse, status_code=201)
 def create_movie(
     movie_data: MovieCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    api_key: str = Security(verify_api_key)
 ):
     """
     Upload a new movie to the catalog.

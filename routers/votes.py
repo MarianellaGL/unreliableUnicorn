@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException, Depends, Request
+from fastapi import APIRouter, HTTPException, Depends, Request, Security
 from sqlalchemy.orm import Session
 from typing import Optional
 
 from models import GeneratedOpinion, UserOpinion, OpinionVote
 from schemas.vote import VoteCreate, VoteResponse
 from database import get_db
+from auth import verify_api_key
 
 router = APIRouter(prefix="/vote", tags=["votes"])
 
@@ -14,7 +15,8 @@ def vote_on_generated_opinion(
     opinion_id: int,
     vote_data: VoteCreate,
     request: Request,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    api_key: str = Security(verify_api_key)
 ):
     """
     Vote on a generated opinion.
@@ -57,7 +59,8 @@ def vote_on_user_opinion(
     opinion_id: int,
     vote_data: VoteCreate,
     request: Request,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    api_key: str = Security(verify_api_key)
 ):
     """
     Vote on a user-submitted opinion.
