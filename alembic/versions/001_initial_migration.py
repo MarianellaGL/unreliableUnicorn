@@ -85,8 +85,9 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('movie_id', sa.Integer(), nullable=False),
     sa.Column('content', sa.Text(), nullable=False),
-    sa.Column('tone', sa.String(length=50), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('absurdity_score', sa.Float(), nullable=False, server_default='0.0'),
+    sa.Column('generation_method', sa.String(length=100), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['movie_id'], ['movies.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
@@ -98,9 +99,9 @@ def upgrade() -> None:
     op.create_table('user_opinions',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('movie_id', sa.Integer(), nullable=False),
-    sa.Column('author_name', sa.String(length=100), nullable=False),
+    sa.Column('author_name', sa.String(length=255), nullable=True),
     sa.Column('content', sa.Text(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['movie_id'], ['movies.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )

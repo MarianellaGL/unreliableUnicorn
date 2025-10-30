@@ -15,6 +15,11 @@ load_dotenv()
 # Configuration
 TMDB_API_KEY = os.getenv("TMDB_URL")  # Note: env var is named TMDB_URL
 DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Fix Render's postgres:// URL to postgresql:// for SQLAlchemy
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
 TMDB_BASE_URL = "https://api.themoviedb.org/3"
 TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500"
 
