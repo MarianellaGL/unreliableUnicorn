@@ -236,24 +236,6 @@ def create_movie(
     return new_movie
 
 
-@router.get("/{movie_id}", response_model=MovieResponse)
-def get_movie_by_id(
-    movie_id: int,
-    db: Session = Depends(get_db)
-):
-    """
-    Get a specific movie by its ID.
-
-    Returns detailed information about a single movie including all metadata.
-    """
-    movie = db.query(Movie).filter(Movie.id == movie_id).first()
-
-    if not movie:
-        raise HTTPException(status_code=404, detail=f"Movie with id {movie_id} not found")
-
-    return movie
-
-
 @router.get("/search", response_model=List[MovieResponse])
 def search_movies(
     q: str = Query(..., min_length=1, description="Search query for movie title"),
@@ -278,3 +260,21 @@ def search_movies(
         raise HTTPException(status_code=404, detail=f"No movies found matching '{q}'")
 
     return movies
+
+
+@router.get("/{movie_id}", response_model=MovieResponse)
+def get_movie_by_id(
+    movie_id: int,
+    db: Session = Depends(get_db)
+):
+    """
+    Get a specific movie by its ID.
+
+    Returns detailed information about a single movie including all metadata.
+    """
+    movie = db.query(Movie).filter(Movie.id == movie_id).first()
+
+    if not movie:
+        raise HTTPException(status_code=404, detail=f"Movie with id {movie_id} not found")
+
+    return movie
