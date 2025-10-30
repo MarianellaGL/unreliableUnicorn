@@ -1,5 +1,6 @@
 from typing import Optional, List
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
+from datetime import date
 
 
 class GenreSchema(BaseModel):
@@ -22,6 +23,10 @@ class MovieResponse(BaseModel):
     vote_average: Optional[float]
     vote_count: Optional[int]
     genres: List[GenreSchema] = []
+
+    @field_serializer('release_date')
+    def serialize_release_date(self, value: Optional[date]) -> Optional[str]:
+        return value.isoformat() if value else None
 
     class Config:
         from_attributes = True
