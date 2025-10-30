@@ -40,12 +40,15 @@ def get_random_movie(db: Session = Depends(get_db)):
     # Format genres as list of names
     genre_names = [genre.name for genre in movie.genres]
 
+    # Convert date to string if it exists
+    release_date_str = movie.release_date.isoformat() if movie.release_date else None
+
     return RandomMovieResponse(
         title=movie.title,
         original_title=movie.original_title,
         poster_url=movie.poster_url,
         backdrop_url=movie.backdrop_url,
-        release_date=movie.release_date,
+        release_date=release_date_str,
         runtime=movie.runtime,
         vote_average=movie.vote_average,
         genres=genre_names,
