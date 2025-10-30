@@ -24,11 +24,12 @@ A playful REST API that serves real movie data mixed with nonsensical, sarcastic
 |----------|--------|---------------|-------------|
 | `/` | GET | ❌ | Welcome message with endpoint list |
 | `/pelicula/random` | GET | ❌ | Random movie with real review + fake opinion |
+| `/pelicula/{id}` | GET | ❌ | **NEW!** Get a specific movie by ID |
 | `/pelicula/search` | GET | ❌ | Search movies by title |
-| `/pelicula/` | POST | ✅ | **NEW!** Upload a new movie to the catalog |
+| `/pelicula/` | POST | ✅ | Upload a new movie to the catalog |
 | `/pelicula/{id}/opinion` | POST | ✅ | Add your own opinion to a movie |
-| `/pelicula/{id}/absurd-opinion` | POST | ✅ | **NEW!** Create an absurd/generated opinion |
-| `/pelicula/{id}/review` | POST | ✅ | **NEW!** Submit an anonymous review for a movie |
+| `/pelicula/{id}/absurd-opinion` | POST | ✅ | Create an absurd/generated opinion |
+| `/pelicula/{id}/review` | POST | ✅ | Submit an anonymous review for a movie |
 | `/opiniones/top` | GET | ❌ | Top-ranked absurd opinions |
 | `/vote/opinion/{id}` | POST | ✅ | Vote on a generated opinion |
 | `/vote/user-opinion/{id}` | POST | ✅ | Vote on a user opinion |
@@ -144,6 +145,7 @@ Quick deploy button:
 
 ```json
 {
+  "id": 42,
   "title": "Interstellar",
   "poster_url": "https://image.tmdb.org/t/p/w500/...",
   "release_date": "2014-11-05",
@@ -152,6 +154,34 @@ Quick deploy button:
   "genres": ["Adventure", "Drama", "Science Fiction"],
   "real_review": "An ambitious, emotional, and visually stunning space epic.",
   "fake_opinion": "The plot twist? My seat was uncomfortable the whole time."
+}
+```
+
+### GET /pelicula/{id}
+
+**Request:**
+```
+GET /pelicula/42
+```
+
+**Response:**
+```json
+{
+  "id": 42,
+  "title": "Interstellar",
+  "original_title": "Interstellar",
+  "overview": "The adventures of a group of explorers who make use of a newly discovered wormhole...",
+  "release_date": "2014-11-05",
+  "runtime": 169,
+  "poster_url": "https://image.tmdb.org/t/p/w500/...",
+  "backdrop_url": "https://image.tmdb.org/t/p/original/...",
+  "vote_average": 8.462,
+  "vote_count": 35891,
+  "genres": [
+    {"id": 12, "name": "Adventure"},
+    {"id": 18, "name": "Drama"},
+    {"id": 878, "name": "Science Fiction"}
+  ]
 }
 ```
 
