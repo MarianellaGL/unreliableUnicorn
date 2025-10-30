@@ -283,8 +283,8 @@ def get_movie_by_id(
         random_review = random.choice(movie.external_reviews)
         real_review_text = random_review.content
 
-    # Get a random fake opinion (if exists)
-    fake_opinion_text = None
+    # Get a random fake opinion
+    fake_opinion_text = "This movie is unreliable... like a unicorn!"
     if movie.generated_opinions:
         random_opinion = random.choice(movie.generated_opinions)
         fake_opinion_text = random_opinion.content

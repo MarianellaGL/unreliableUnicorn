@@ -78,7 +78,7 @@ class MovieDetailResponse(BaseModel):
     vote_count: Optional[int]
     genres: List[GenreSchema] = []
     real_review: Optional[str] = None
-    fake_opinion: Optional[str] = None
+    fake_opinion: str  # Always present, even if just a default
 
     @validator('release_date', pre=True)
     def convert_date_to_string(cls, v):
