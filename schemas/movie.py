@@ -62,3 +62,29 @@ class RandomMovieResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class MovieDetailResponse(BaseModel):
+    """Response for GET /pelicula/{id} with reviews and opinions"""
+    id: int
+    title: str
+    original_title: Optional[str]
+    overview: Optional[str]
+    poster_url: Optional[str]
+    backdrop_url: Optional[str]
+    release_date: Optional[str]
+    runtime: Optional[int]
+    vote_average: Optional[float]
+    vote_count: Optional[int]
+    genres: List[GenreSchema] = []
+    real_review: Optional[str] = None
+    fake_opinion: Optional[str] = None
+
+    @validator('release_date', pre=True)
+    def convert_date_to_string(cls, v):
+        if isinstance(v, date):
+            return v.isoformat()
+        return v
+
+    class Config:
+        from_attributes = True

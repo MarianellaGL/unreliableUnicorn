@@ -6,7 +6,7 @@ from typing import Optional, List
 
 from models import Movie, ExternalReview, GeneratedOpinion, UserOpinion, Genre
 from models.review import ReviewSource
-from schemas.movie import RandomMovieResponse, MovieResponse, MovieCreate
+from schemas.movie import RandomMovieResponse, MovieResponse, MovieCreate, MovieDetailResponse
 from schemas.opinion import OpinionCreate, OpinionResponse, GeneratedOpinionCreate, GeneratedOpinionResponse
 from schemas.review import ReviewCreate, ReviewResponse
 from database import get_db
@@ -262,7 +262,7 @@ def search_movies(
     return movies
 
 
-@router.get("/{movie_id}", response_model=MovieResponse)
+@router.get("/{movie_id}", response_model=MovieDetailResponse)
 def get_movie_by_id(
     movie_id: int,
     db: Session = Depends(get_db)
@@ -270,11 +270,37 @@ def get_movie_by_id(
     """
     Get a specific movie by its ID.
 
-    Returns detailed information about a single movie including all metadata.
+    Returns detailed information including a random real review and fake opinion.
     """
     movie = db.query(Movie).filter(Movie.id == movie_id).first()
 
     if not movie:
         raise HTTPException(status_code=404, detail=f"Movie with id {movie_id} not found")
 
-    return movie
+    # Get a random real review (if exists)
+    real_review_text = None
+    if movie.external_reviews:
+        random_review = random.choice(movie.external_reviews)
+        real_review_text = random_review.content
+
+    # Get a random fake opinion (if exists)
+    fake_opinion_text = None
+    if movie.generated_opinions:
+        random_opinion = random.choice(movie.generated_opinions)
+        fake_opinion_text = random_opinion.content
+
+    return MovieDetailResponse(
+        id=movie.id,
+        title=movie.title,
+        original_title=movie.original_title,
+        overview=movie.overview,
+        poster_url=movie.poster_url,
+        backdrop_url=movie.backdrop_url,
+        release_date=movie.release_date,
+        runtime=movie.runtime,
+        vote_average=movie.vote_average,
+        vote_count=movie.vote_count,
+        genres=movie.genres,
+        real_review=real_review_text,
+        fake_opinion=fake_opinion_text
+    )
