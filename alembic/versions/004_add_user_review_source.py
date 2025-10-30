@@ -17,8 +17,10 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # Add 'user' to the reviewsource enum in PostgreSQL
-    op.execute("ALTER TYPE reviewsource ADD VALUE IF NOT EXISTS 'user'")
+    # The source column in external_reviews is stored as String(50), not as an enum
+    # So this migration is a no-op - the 'user' value can be inserted directly
+    # No schema changes needed since it's just a string field
+    pass
 
 
 def downgrade() -> None:
