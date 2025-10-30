@@ -1,7 +1,7 @@
 """Add USER source to ReviewSource enum
 
-Revision ID: add_user_review_source
-Revises:
+Revision ID: 004_add_user_review_source
+Revises: 003_fix_opinions
 Create Date: 2025-10-30
 
 """
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'add_user_review_source'
-down_revision = None  # Update this to your latest migration ID
+revision = '004_add_user_review_source'
+down_revision = '003_fix_opinions'
 branch_labels = None
 depends_on = None
 
