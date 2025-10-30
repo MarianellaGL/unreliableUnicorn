@@ -39,7 +39,8 @@ def get_top_opinions(
     ).outerjoin(
         OpinionVote, GeneratedOpinion.id == OpinionVote.generated_opinion_id
     ).group_by(
-        GeneratedOpinion.id
+        GeneratedOpinion.id,
+        Movie.title
     ).order_by(
         # Sort by absurdity score first, then by vote balance
         GeneratedOpinion.absurdity_score.desc(),
